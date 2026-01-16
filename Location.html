@@ -120,4 +120,59 @@
       return;
     }
 
-    mainBtn.d
+    mainBtn.disabled = true;
+    mainBtn.innerText = "Getting Location...";
+    updateUI("Requesting GPS access…", "info");
+
+    navigator.geolocation.getCurrentPosition(
+      pos => handleSuccess(pos, name, phone),
+      err => handleError(err),
+      { enableHighAccuracy:true, timeout:10000 }
+    );
+  }
+
+  function handleError(err) {
+    mainBtn.disabled = false;
+    mainBtn.innerText = "RETRY";
+    updateUI("Location permission denied or unavailable.", "err", true);
+  }
+
+  function handleSuccess(position, name, phone) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
+
+    /* Save to Google Sheet */
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+        mobile: phone,
+        latitude: lat,
+        longitude: lng,
+        map: mapLink,
+        event: EVENT_NAME,
+        center: CENTER_NAME
+      })
+    }).catch(()=>{});
+
+    /* WhatsApp message to SAME number */
+    const waNumber = "91" + phone;
+
+    const message =
+      `*Event Check-In*%0A` +
+      `*Name:* ${name}%0A` +
+      `*Mobile:* ${phone}%0A` +
+      `*Event:* ${EVENT_NAME}%0A` +
+      `*Center:* ${CENTER_NAME}%0A` +
+      `*Live Location:* ${mapLink}`;
+
+    updateUI("Opening WhatsApp…", "info");
+
+    window.location.href =
+      `https://wa.me/${waNumber}?text=${message}`;
+  }
+</script>
+
+</body>
+</html>
