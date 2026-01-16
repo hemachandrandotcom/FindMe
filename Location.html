@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Share Location</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: serif;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .heading {
+      font-size: 28px;
+      margin: 8px 0;
+    }
+
+    .field-wrapper {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      max-width: 400px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2 id="title">📍 Share Your Location</h2>
+
+  <p class="heading">
+    Mahashivratri 2026
+  </p>
+
+  <p class="heading">
+    Isha Yoga Center, Coimbatore
+  </p>
+
+  <br>
+
+  <div class="field-wrapper">
+    <label for="name">Name</label>
+    <input type="text" id="name" placeholder="Enter your name">
+  </div>
+
+  <div class="field-wrapper">
+    <label for="phone">Mobile Number</label>
+    <input type="tel" id="phone" placeholder="Enter mobile number" inputmode="numeric">
+  </div>
+
+  <button id="sendBtn" onclick="checkPermissionAndGetLocation()">
+    📲 Send Location via WhatsApp
+  </button>
+
+<script>
+/* 🔴 CONFIGURATION — CHANGE ONLY THESE */
+const EVENT_NAME = "Mahashivratri 2026";
+const CENTER_NAME = "Isha Yoga Center, Coimbatore";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwt9SuXCyZwZfH8Zm1Y5hBWBDvmKe6WnKagcuOoCHeWdGpnsGB2oaN1XWg7AZpCNOE9Pw/exec";
+
+/* permission FUNCTION */
+async function checkPermissionAndGetLocation() {
+  if (!navigator.permissions) {
+    getLocation();
+    return;
+  }
+
+  const status = await navigator.permissions.query({ name: "geolocation" });
+
+  if (status.state === "denied") {
+    showLocationHelp();
+    return;
+  }
+
+  sendLocation();
+}
+
+
+function showLocationHelp() {
+  alert(
+    "Location access is blocked.\n\n" +
+    "Please enable location:\n\n" +
+    "Android:\n" +
+    "• Turn ON Location\n" +
+    "• Settings → Apps → Browser / WhatsApp → Allow Location\n\n" +
+    "iPhone:\n" +
+    "• Settings → Privacy & Security → Location Services → ON\n" +
+    "• Safari / Browser → Allow Location\n\n" +
+    "After enabling, come back and tap the button again."
+  );
+}
+
+
+/* MAIN FUNCTION */
+function sendLocation() {
+
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    alert("Please enter a valid 10-digit mobile number");
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this device");
+    return;
+  }
+
+  document.getElementById("sendBtn").innerText = "Fetching location...";
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const mapLink = `https://maps.google.com/?q=${lat},${lng}`;
+
+      /* Save to Google Sheet */
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          name: name,
+          mobile: phone,
+          latitude: lat,
+          longitude: lng,
+          map: mapLink,
+          event: EVENT_NAME,
+          center: CENTER_NAME
+        })
+      });
+
+      /* WhatsApp message to USER */
+      const message =
+        `Location Details\n\n` +
+        `Event: ${EVENT_NAME}\n` +
+        `Center: ${CENTER_NAME}\n` +
+        `Name: ${name}\n` +
+        `Mobile: ${phone}\n\n` +
+        `Your Current Location:\n${mapLink}`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.location.href = waUrl;
+    },
+    () => {
+      alert("Please allow location access");
+      document.getElementById("sendBtn").innerText = "📲 Send Location via WhatsApp";
+    }
+  );
+}
+</script>
+
+</body>
+</html>
