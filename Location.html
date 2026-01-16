@@ -79,7 +79,7 @@
   <div id="status"></div>
 
   <button class="btn" id="mainBtn" onclick="startProcess()">
-    SHARE LOCATION
+    Get your LOCATION
   </button>
 
   <div id="guide" class="guide-box">
@@ -94,8 +94,8 @@
 
 <script>
   /* CONFIG */
-  const EVENT_NAME = "Regional Meetup 2026";
-  const CENTER_NAME = "City Hall Main Wing";
+  const EVENT_NAME = "Mahashivratri 2026";
+  const CENTER_NAME = "Isha Yoga Center, Coimbatore";
 
   const GOOGLE_SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbwt9SuXCyZwZfH8Zm1Y5hBWBDvmKe6WnKagcuOoCHeWdGpnsGB2oaN1XWg7AZpCNOE9Pw/exec";
@@ -160,11 +160,11 @@
     const COUNTRY_CODE = "91";
 
     const message =
-      `*Event Check-In*%0A` +
-      `*Name:* ${name}%0A` +
-      `*Mobile:* ${phone}%0A` +
-      `*Event:* ${EVENT_NAME}%0A` +
-      `*Center:* ${CENTER_NAME}%0A` +
+      `*Your Saved Location*\n\n` +
+      `*Name:* ${name}\n` +
+      `*Mobile:* ${phone}\n` +
+      `*Event:* ${EVENT_NAME}\n` +
+      `*Center:* ${CENTER_NAME}\n` +
       `*Live Location:* ${mapLink}`;
 
     updateUI("Opening WhatsApp…", "info");
@@ -178,4 +178,5 @@
 
 </body>
 </html>
+
 
